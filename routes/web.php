@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,44 +14,58 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+Route::get('/', function (Request $request) {
+    // Id de Monitor
     $monitorQuery = DB::select('select id from dolar_origen where name=?',['Monitor Dolar']);
     $monitorId = $monitorQuery[0]->id;
-
+    // Id de BCV
     $bcvQuery = DB::select('select id from dolar_origen where name=?',['BCV']);
     $bcvId = $bcvQuery[0]->id;
 
-    $tasaDolarMonitor = DB::select('select * from tasa_dolar where origin_id=?',[$monitorId]);
-    $tasaDolarBCV = DB::select('select * from tasa_dolar where origin_id=?',[$bcvId]);
+    // Registro de Tasa
+    $tasaDolarMonitor = DB::select('select id,rate,created_at from tasa_dolar where origin_id=?',[$monitorId]);
+    $tasaDolarBCV = DB::select('select id,rate,created_at from tasa_dolar where origin_id=?',[$bcvId]);
+    
+    $originDolar = $request->query('origin');
 
-    $tasaDatasetMonitor = [
+    if($originDolar=='bcv'){
+        $tasaDolar = $tasaDolarBCV;
+        $originDolar = 'BCV';
+    }else{
+        $tasaDolar = $tasaDolarMonitor;
+        $originDolar = 'Monitor Dolar';
+    }
+    // Data set    
+    $tasaDataset = [
         "date" =>[],
         "rate" =>[]
     ];
-    $tasaDatasetBCV = [
-        "date" =>[],
-        "rate" =>[]
-    ];
-
-
-    // Parse Monitor Dataset
-    foreach($tasaDolarMonitor as $tasa){
-        array_push($tasaDatasetMonitor["date"],$tasa->created_at);
-        $tasa->rate += 0.0; 
-        array_push($tasaDatasetMonitor["rate"],$tasa->rate);
+    // Parse Dataset
+    foreach($tasaDolar as $tasa){
+        array_push($tasaDataset["date"],$tasa->created_at);
+        array_push($tasaDataset["rate"],$tasa->rate);
     }
-    // Parse BCV Dataset
-    foreach($tasaDolarBCV as $tasa){
-        array_push($tasaDatasetBCV["date"],$tasa->created_at);
-        array_push($tasaDatasetBCV["rate"],$tasa->rate);
+    
+    // Date processing
+    $counter = 1;
+    foreach($tasaDolar as $tasa){
+        $timestamp = $tasa->created_at;
+        unset($tasa->created_at);
+        $timestamp_aux = explode(" ",$timestamp);
+        $tasa->date = $timestamp_aux[0];
+        $tasa->time = $timestamp_aux[1];
+        $tasa->id = $counter;
+        $counter++;
     }
-
+    
     return view('dashboard',[
-        "tasaDatasetMonitor" => $tasaDatasetMonitor
+        "tasaDolar" => $tasaDolar,
+        "originDolar" => $originDolar,
+        "tasaDataset" => $tasaDataset
     ]);
-});
+})->name('dashboard');
 
-Route::get('/deudas', function () {
+Route::get('/deudas', function (Request $request) {
     // Deudas no pagadas
     $deudas = DB::select('select * from deuda where payed =?',[0]);
 
@@ -69,7 +84,7 @@ Route::get('/deudas', function () {
         foreach($montos as $monto){
             $total_persona += $monto;
         }
-        $deuda_per_persona[$persona] = '$'.$total_persona;
+        $deuda_per_persona[$persona] = $total_persona;
     }
     
     // Deudas pagadas
@@ -90,14 +105,69 @@ Route::get('/deudas', function () {
         foreach($montos as $monto){
             $total_persona += $monto;
         }
-        $pagadas_per_persona[$persona] = '$'.$total_persona;
+        $pagadas_per_persona[$persona] = $total_persona;
     }
 
-    return view('index',[
-        "deudas" => $deudas,
-        "deudas_pagadas" => $deudas_pagadas,
-        "deudas_per_persona" => $deuda_per_persona,
-        "pagada_per_persona" => $pagadas_per_persona
+    if($request->query('mode')=='perperson'){
+        return view('deudasPerPer',[
+            "deudas_per_persona" => $deuda_per_persona,
+            "pagada_per_persona" => $pagadas_per_persona
+        ]);
+    }else{
+        return view('deudasLog',[
+            "deudas" => $deudas,
+            "deudas_pagadas" => $deudas_pagadas,
+        ]);
+    }
+})->name('deudas');
 
+Route::get('/tasaDolar', function (Request $request) {
+    // Id de Monitor
+    $monitorQuery = DB::select('select id from dolar_origen where name=?',['Monitor Dolar']);
+    $monitorId = $monitorQuery[0]->id;
+    // Id de BCV
+    $bcvQuery = DB::select('select id from dolar_origen where name=?',['BCV']);
+    $bcvId = $bcvQuery[0]->id;
+
+    // Registro de Tasa
+    $tasaDolarMonitor = DB::select('select id,rate,created_at from tasa_dolar where origin_id=?',[$monitorId]);
+    $tasaDolarBCV = DB::select('select id,rate,created_at from tasa_dolar where origin_id=?',[$bcvId]);
+    
+    $originDolar = $request->query('origin');
+
+    if($originDolar=='bcv'){
+        $tasaDolar = $tasaDolarBCV;
+        $originDolar = 'BCV';
+    }else{
+        $tasaDolar = $tasaDolarMonitor;
+        $originDolar = 'Monitor Dolar';
+    }
+    // Data set    
+    $tasaDataset = [
+        "date" =>[],
+        "rate" =>[]
+    ];
+    // Parse Dataset
+    foreach($tasaDolar as $tasa){
+        array_push($tasaDataset["date"],$tasa->created_at);
+        array_push($tasaDataset["rate"],$tasa->rate);
+    }
+    
+    // Date processing
+    $counter = 1;
+    foreach($tasaDolar as $tasa){
+        $timestamp = $tasa->created_at;
+        unset($tasa->created_at);
+        $timestamp_aux = explode(" ",$timestamp);
+        $tasa->date = $timestamp_aux[0];
+        $tasa->time = $timestamp_aux[1];
+        $tasa->id = $counter;
+        $counter++;
+    }
+    
+    return view('dashboard',[
+        "tasaDolar" => $tasaDolar,
+        "originDolar" => $originDolar,
+        "tasaDataset" => $tasaDataset
     ]);
-});
+})->name('tasaDolar');
