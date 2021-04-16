@@ -9,7 +9,7 @@
           <button class="btn btn-sm btn-outline-secondary"><a href="{{route('indexTasaDolar').'?origin=monitor'}}">Monitor</a></button>
           <button class="btn btn-sm btn-outline-secondary"><a href="{{route('indexTasaDolar').'?origin=bcv'}}">BCV</a></button>
         </div>
-        <a href="#agregar" class="btn btn-sm btn-outline-secondary">
+        <a href="{{route('agregarTasaDolar')}}" class="btn btn-sm btn-outline-secondary">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
           Agregar Tasa
         </a>
@@ -17,12 +17,12 @@
     </div>
 
     
-    <div id="react-chart"></div>
-    {{-- <canvas className="my-4 chartjs-render-monitor" id="myChart" width="696" height="293" style="
+    {{-- <div id="react-chart"></div> --}}
+    <canvas className="my-4 chartjs-render-monitor" id="myChart" width="696" height="293" style="
       display: block;
       width: 696px;
       height: 293px;
-  "></canvas> --}}
+    "></canvas>
 
     <h2>Log de Tasa de Cambio ({{$originDolar}})</h2>
     <div class="table-responsive">
@@ -52,23 +52,16 @@
 
 @section('scripts')
     <!-- Graphs -->
-    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script> --}}
-    {{-- <script>
-    const ctx = document.getElementById("myChart");
-    const myChart = new Chart(ctx, {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+    <script>
+    var ctx = document.getElementById("myChart");
+    var myChart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: [
-            @foreach($tasaDataset['date'] as $date) 
-                "{{$date}}",
-            @endforeach
-            ],
+          labels: [],
           datasets: [{
-            data: [
-                @foreach($tasaDataset['rate'] as $rate) 
-                    {{$rate}},
-                @endforeach
-                ],
+            label: "Bs/$",
+            data: [],
             lineTension: 0,
             backgroundColor: 'transparent',
             borderColor: '#007bff',
@@ -85,9 +78,35 @@
             }]
           },
           legend: {
-            display: false,
+            display: true,
           }
         }
       });
-    </script> --}}
+
+      var updateChart = function() {
+      $.ajax({
+        url: "{{ route('api.chart').'?origin='.strtolower($originDolar) }}",
+        type: 'GET',
+        dataType: 'json',
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(data) {
+          myChart.data.labels = data.labels;
+          myChart.data.datasets[0].data = data.data;
+          myChart.data.datasets[0].label =" Bs/$ ("+data.origin+")";
+          myChart.update();
+        },
+        error: function(data){
+          console.log(data);
+        }
+      });
+    }
+    
+    updateChart();
+    setInterval(() => {
+      updateChart();
+    }, 10000);
+
+    </script>
 @endsection

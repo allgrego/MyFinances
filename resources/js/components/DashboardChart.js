@@ -38,13 +38,21 @@ function DashboardChart() {
     return (
       <>      
         <h4>Chart</h4>
-        <Bar
+        {/* <Bar
           width={600}
           height={400}
           data={{
-            labels:{labels}
+            labels:["red", "blue", "yellow", "green"],
+            datasets:[
+              {
+                label:"# of votes",
+                data:[1,2,3,4]
+              }
+            ]
+
           }}
-          />
+          options={{ maintainAspectRatio: false }}
+          /> */}
       </>
     );
 }

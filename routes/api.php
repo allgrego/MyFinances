@@ -60,3 +60,47 @@ Route::get('/deudas', function (Request $request) {
     }    
 });
 
+
+Route::get('/dolar', function (Request $request) {
+    // Id de Monitor
+    $monitorQuery = DB::select('select id from dolar_origen where name=?',['Monitor Dolar']);
+    $monitorId = $monitorQuery[0]->id;
+    // Id de BCV
+    $bcvQuery = DB::select('select id from dolar_origen where name=?',['BCV']);
+    $bcvId = $bcvQuery[0]->id;
+
+    // Registro de Tasa
+    $tasaDolarMonitor = DB::select('select id,rate,created_at from tasa_dolar where origin_id=?',[$monitorId]);
+    $tasaDolarBCV = DB::select('select id,rate,created_at from tasa_dolar where origin_id=?',[$bcvId]);
+    
+    $originDolar = $request->query('origin');
+
+    if($originDolar=='bcv'){
+        $tasaDolar = $tasaDolarBCV;
+        $originDolar = 'BCV';
+    }else{
+        $tasaDolar = $tasaDolarMonitor;
+        $originDolar = 'Monitor Dolar';
+    }
+    // Data set    
+    $tasaDataset = [
+        "date" =>[],
+        "rate" =>[]
+    ];
+    // Parse Dataset
+    foreach($tasaDolar as $tasa){
+        array_push($tasaDataset["date"],$tasa->created_at);
+        array_push($tasaDataset["rate"],$tasa->rate);
+    }
+
+
+    $response = [
+        "origin" => $originDolar,
+        "data" => $tasaDataset["rate"],
+        "labels" => $tasaDataset["date"]
+    ];
+
+    return json_encode($response);
+    
+})->name('api.chart');
+
