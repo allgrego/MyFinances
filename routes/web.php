@@ -80,3 +80,4 @@ Route::get('/deudas', function (Request $request) {
 /** Tasa Dolar **/
 Route::get('/dolar',[TasaDolarController::class,'display'])->name('indexTasaDolar');
 Route::get('/dolar/add',[TasaDolarController::class,'addRate'])->name('agregarTasaDolar');
+Route::post('/dolar/add',[TasaDolarController::class,'insertNewRate'])->name('addNewTasaDolar');

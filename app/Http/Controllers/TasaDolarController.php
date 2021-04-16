@@ -51,7 +51,7 @@ class TasaDolarController extends Controller
             $counter++;
         }
         
-        return view('tasaDolarIndex',[
+        return view('tasaDolar/index',[
             "tasaDolar" => $tasaDolar,
             "originDolar" => $originDolar,
             "tasaDataset" => $tasaDataset
@@ -59,6 +59,39 @@ class TasaDolarController extends Controller
     }
 
     public function addRate (Request $request) {
-        return 'add rate page';
+        $origins = DB::select('select * from dolar_origen where name !=?',['Otros']);        
+
+        return view('tasaDolar/new',[
+            "dolarOrigins" => $origins
+        ]);
+    }
+
+    public function insertNewRate (Request $request) {
+        $inputs =  $request->except('_token');
+
+        if(empty($inputs)){
+            return redirect(route('agregarTasaDolar').'?error=1');    
+        }
+
+        $inputs['dolar-rate'] = str_replace(",",".",$inputs['dolar-rate']);
+
+        $origin = DB::select('select name from dolar_origen where id =?',[$inputs['origin']]);        
+
+        if(!empty($origin)){
+            $origin = $origin[0]->name;
+            $origin = explode(" ",$origin);
+            $origin = $origin[0];
+            $origin = strtolower($origin);
+        }        
+
+        DB::insert('insert into tasa_dolar (id, rate,origin_id,created_at) values (?, ?, ?, ?)', 
+        [
+            null,
+            $inputs['dolar-rate'],
+            $inputs['origin'],
+            null
+        ]);
+
+        return redirect(route('indexTasaDolar').'?origin='.$origin);
     }
 }

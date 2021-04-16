@@ -25,8 +25,9 @@
     "></canvas>
 
     <h2>Log de Tasa de Cambio ({{$originDolar}})</h2>
+    <table id="example" class="display" width="100%"></table>
     <div class="table-responsive">
-      <table class="table table-striped table-sm">
+      <table class="table table-striped table-sm" id="list-table">
         <thead>
           <tr>
             <th>#</th>
@@ -36,14 +37,12 @@
           </tr>
         </thead>
         <tbody>
-          @foreach ($tasaDolar as $tasaDiaria)
           <tr>
-              <td>{{$tasaDiaria->id}}</td>
-              <td>Bs {{(float)$tasaDiaria->rate}}</td>
-              <td>{{$tasaDiaria->date}}</td>
-              <td>{{$tasaDiaria->time}}</td>
+            <td style="font-weight: 600">Cargando ...</td>
+            <td></td>
+            <td></td>
+            <td></td>
           </tr>
-          @endforeach
         </tbody>
       </table>
     </div>
@@ -62,12 +61,14 @@
           datasets: [{
             label: "Bs/$",
             data: [],
-            lineTension: 0,
+            lineTension: 0.1,
             backgroundColor: 'transparent',
-            borderColor: '#007bff',
-            borderWidth: 4,
-            pointBackgroundColor: '#007bff'
-          }]
+            borderColor: '#3490dc',
+            borderWidth: 3,
+            pointBackgroundColor: '#007bff'            
+            
+          }
+        ]
         },
         options: {
           scales: {
@@ -83,7 +84,7 @@
         }
       });
 
-      var updateChart = function() {
+      var updateTasa = function() {
       $.ajax({
         url: "{{ route('api.chart').'?origin='.strtolower($originDolar) }}",
         type: 'GET',
@@ -101,11 +102,40 @@
           console.log(data);
         }
       });
+
+      $.ajax({
+        url: "{{ route('api.chart.list').'?origin='.strtolower($originDolar) }}",
+        type: 'GET',
+        dataType: 'json',
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(data) {
+
+          var table = document.getElementById('list-table').getElementsByTagName('tbody')[0];
+          
+          // Elimina los rows de la table si tiene
+          if(table.rows.length){
+              table.innerHTML = "";
+          }
+
+          data.list.map(function(tasa){
+            var newRow = table.insertRow(tasa.rowid);
+            newRow.innerHTML = `<td>${tasa.id}</td>
+              <td>Bs ${tasa.rate}</td>
+              <td>${tasa.date}</td>
+              <td>${tasa.time}</td>`;
+          });
+        },
+        error: function(data){
+          console.log(data);
+        }
+      });
     }
     
-    updateChart();
+    updateTasa();
     setInterval(() => {
-      updateChart();
+      updateTasa();
     }, 10000);
 
     </script>
