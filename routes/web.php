@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
+use App\Http\Controllers\TasaDolarController;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,55 +17,8 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/', function (Request $request) {
-    // Id de Monitor
-    $monitorQuery = DB::select('select id from dolar_origen where name=?',['Monitor Dolar']);
-    $monitorId = $monitorQuery[0]->id;
-    // Id de BCV
-    $bcvQuery = DB::select('select id from dolar_origen where name=?',['BCV']);
-    $bcvId = $bcvQuery[0]->id;
-
-    // Registro de Tasa
-    $tasaDolarMonitor = DB::select('select id,rate,created_at from tasa_dolar where origin_id=?',[$monitorId]);
-    $tasaDolarBCV = DB::select('select id,rate,created_at from tasa_dolar where origin_id=?',[$bcvId]);
-    
-    $originDolar = $request->query('origin');
-
-    if($originDolar=='bcv'){
-        $tasaDolar = $tasaDolarBCV;
-        $originDolar = 'BCV';
-    }else{
-        $tasaDolar = $tasaDolarMonitor;
-        $originDolar = 'Monitor Dolar';
-    }
-    // Data set    
-    $tasaDataset = [
-        "date" =>[],
-        "rate" =>[]
-    ];
-    // Parse Dataset
-    foreach($tasaDolar as $tasa){
-        array_push($tasaDataset["date"],$tasa->created_at);
-        array_push($tasaDataset["rate"],$tasa->rate);
-    }
-    
-    // Date processing
-    $counter = 1;
-    foreach($tasaDolar as $tasa){
-        $timestamp = $tasa->created_at;
-        unset($tasa->created_at);
-        $timestamp_aux = explode(" ",$timestamp);
-        $tasa->date = $timestamp_aux[0];
-        $tasa->time = $timestamp_aux[1];
-        $tasa->id = $counter;
-        $counter++;
-    }
-    
-    return view('dashboard',[
-        "tasaDolar" => $tasaDolar,
-        "originDolar" => $originDolar,
-        "tasaDataset" => $tasaDataset
-    ]);
+Route::get('/', function (Request $request) {    
+    return view('index');
 })->name('dashboard');
 
 Route::get('/deudas', function (Request $request) {
@@ -109,65 +65,18 @@ Route::get('/deudas', function (Request $request) {
     }
 
     if($request->query('mode')=='perperson'){
-        return view('deudasPerPer',[
+        return view('deudas/perPer',[
             "deudas_per_persona" => $deuda_per_persona,
             "pagada_per_persona" => $pagadas_per_persona
         ]);
     }else{
-        return view('deudasLog',[
+        return view('deudas/log',[
             "deudas" => $deudas,
             "deudas_pagadas" => $deudas_pagadas,
         ]);
     }
 })->name('deudas');
 
-Route::get('/tasaDolar', function (Request $request) {
-    // Id de Monitor
-    $monitorQuery = DB::select('select id from dolar_origen where name=?',['Monitor Dolar']);
-    $monitorId = $monitorQuery[0]->id;
-    // Id de BCV
-    $bcvQuery = DB::select('select id from dolar_origen where name=?',['BCV']);
-    $bcvId = $bcvQuery[0]->id;
-
-    // Registro de Tasa
-    $tasaDolarMonitor = DB::select('select id,rate,created_at from tasa_dolar where origin_id=?',[$monitorId]);
-    $tasaDolarBCV = DB::select('select id,rate,created_at from tasa_dolar where origin_id=?',[$bcvId]);
-    
-    $originDolar = $request->query('origin');
-
-    if($originDolar=='bcv'){
-        $tasaDolar = $tasaDolarBCV;
-        $originDolar = 'BCV';
-    }else{
-        $tasaDolar = $tasaDolarMonitor;
-        $originDolar = 'Monitor Dolar';
-    }
-    // Data set    
-    $tasaDataset = [
-        "date" =>[],
-        "rate" =>[]
-    ];
-    // Parse Dataset
-    foreach($tasaDolar as $tasa){
-        array_push($tasaDataset["date"],$tasa->created_at);
-        array_push($tasaDataset["rate"],$tasa->rate);
-    }
-    
-    // Date processing
-    $counter = 1;
-    foreach($tasaDolar as $tasa){
-        $timestamp = $tasa->created_at;
-        unset($tasa->created_at);
-        $timestamp_aux = explode(" ",$timestamp);
-        $tasa->date = $timestamp_aux[0];
-        $tasa->time = $timestamp_aux[1];
-        $tasa->id = $counter;
-        $counter++;
-    }
-    
-    return view('dashboard',[
-        "tasaDolar" => $tasaDolar,
-        "originDolar" => $originDolar,
-        "tasaDataset" => $tasaDataset
-    ]);
-})->name('tasaDolar');
+/** Tasa Dolar **/
+Route::get('/dolar',[TasaDolarController::class,'display'])->name('indexTasaDolar');
+Route::get('/dolar/add',[TasaDolarController::class,'addRate'])->name('agregarTasaDolar');
