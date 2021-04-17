@@ -28,6 +28,7 @@
           </select>
         </div>
         <button type="submit" class="btn btn-primary">Cargar</button>
+        <a href="{{route('indexTasaDolar').'?origin=monitor'}}" class="btn btn-secondary">Cancelar</a>
       </form>
     </div>
   </main>
