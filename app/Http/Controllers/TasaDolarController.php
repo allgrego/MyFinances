@@ -46,11 +46,17 @@ class TasaDolarController extends Controller
             unset($tasa->created_at);
             $timestamp_aux = explode(" ",$timestamp);
             $tasa->date = $timestamp_aux[0];
+            
+            $date_aux = explode("-",$tasa->date);
+            $date_aux = array_reverse($date_aux);
+
+            $tasa->date = implode("-",$date_aux);
+
             $tasa->time = $timestamp_aux[1];
             $tasa->id = $counter;
             $counter++;
         }
-        
+
         return view('tasaDolar/index',[
             "tasaDolar" => $tasaDolar,
             "originDolar" => $originDolar,

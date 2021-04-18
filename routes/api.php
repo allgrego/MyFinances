@@ -90,21 +90,23 @@ Route::get('/dolar', function (Request $request) {
     // Parse Dataset
     foreach($tasaDolar as $tasa){
         array_push($tasaDataset["date"],$tasa->created_at);
-        array_push($tasaDataset["rate"],$tasa->rate);
+        
+        $tasaRate = ($tasa->rate+0.00);
+        $tasaRate = number_format((float)$tasaRate,2,".","");
+        //return $tasaRate;
+        array_push($tasaDataset["rate"],$tasaRate);
     }
 
-    // Date processing
-    $counter = 1;
-    foreach($tasaDolar as $tasa){
-        $timestamp = $tasa->created_at;
-        unset($tasa->created_at);
-        $timestamp_aux = explode(" ",$timestamp);
-        $tasa->date = $timestamp_aux[0];
-        $tasa->time = $timestamp_aux[1];
-        $tasa->id = $counter;
-        $counter++;
+    foreach($tasaDataset["date"] as $key => $date){
+        $auxTimestamp = explode(" ",$date);
+        $auxDate = $auxTimestamp[0];
+        $auxDate = explode("-", $auxDate);
+        $auxDate = array_reverse($auxDate);
+        $auxDate = implode("-",$auxDate);
+        $auxTimestamp[0] = $auxDate;
+        
+        $tasaDataset['date'][$key] = implode(" ",$auxTimestamp);
     }
-
 
     $response = [
         "origin" => $originDolar,
@@ -145,6 +147,11 @@ Route::get('/dolar/list', function (Request $request) {
         $timestamp_aux = explode(" ",$timestamp);
         $tasa->date = $timestamp_aux[0];
         $tasa->time = $timestamp_aux[1];
+        
+        $date_aux = explode("-",$tasa->date);
+        $date_aux = array_reverse($date_aux);
+        $tasa->date = implode("-",$date_aux);
+
         $tasa->id = $counter;
         $tasa->rowid = $rowid;
         $counter--;

@@ -7,21 +7,17 @@
     <title>MyFinances</title>
     <link rel="stylesheet" href="{{asset('css/app.css')}}">
     @yield('style')
+    <style>
+      .custom-bg-dark{
+          background: linear-gradient(red,blue);
+      }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">MyFinances</a>
-      <ul class="navbar-nav px-3">
-        <li class="nav-item text-nowrap">
-          <a class="nav-link" href="{{route('logout')}}">Logout</a>
-        </li>
-      </ul>
-    </nav>
-
     <div class="container-fluid">
       <div class="row">
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-          <div class="sidebar-sticky">
+        <nav class="col-sm-2 d-none d-md-block custom-bg-dark sidebar">
+          <div class="sidebar-sticky sticky-top">
             <ul class="nav flex-column">
               <li class="nav-item">
                 <a class="nav-link active" href="/">
@@ -100,7 +96,19 @@
             </ul>
           </div>
         </nav>
-        @yield('content')        
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 {{-- pt-3 px-4 --}} p-0">
+          <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-1">
+            <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">MyFinances</a>
+            <ul class="navbar-nav px-3">
+              <li class="nav-item text-nowrap">
+                <a class="nav-link" href="{{route('logout')}}">Logout</a>
+              </li>
+            </ul>
+          </nav>
+          <div class="col-12 pt-3 px-4">
+            @yield('content')        
+          </div>
+          </main>
       </div>
     </div>
 

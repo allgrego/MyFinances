@@ -55,3 +55,12 @@ Route::post('/debt/add',[DeudaController::class,'insertNewDebt'])->name('addNewD
 Route::get('/dolar',[TasaDolarController::class,'display'])->name('indexTasaDolar')->middleware('activeSession');
 Route::get('/dolar/add',[TasaDolarController::class,'addRate'])->name('agregarTasaDolar')->middleware('activeSession');
 Route::post('/dolar/add',[TasaDolarController::class,'insertNewRate'])->name('addNewTasaDolar')->middleware('activeSession');
+
+
+/**
+ * Testing
+ */
+
+Route::get('/testing', function (Request $request) {    
+    return view('test');
+});

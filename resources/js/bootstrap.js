@@ -9,8 +9,16 @@ window._ = require('lodash');
 try {
     window.Popper = require('popper.js').default;
     window.$ = window.jQuery = require('jquery');
-    
+    require('@fortawesome/fontawesome-free/css/all.min.css');
+
     require('bootstrap');
+
+    require('jquery.easing/jquery.easing');
+
+    require('./sb-admin-2.min.js');
+
+    require('chart.js/dist/chart');
+    
 } catch (e) {}
 
 /**
