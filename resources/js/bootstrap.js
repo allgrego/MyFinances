@@ -17,7 +17,7 @@ try {
 
     require('./sb-admin-2.min.js');
 
-    require('chart.js/dist/chart');
+    var Chart = require('chart.js/dist/chart.min.js');
     
 } catch (e) {}
 
