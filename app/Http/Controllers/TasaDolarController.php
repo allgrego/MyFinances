@@ -90,12 +90,10 @@ class TasaDolarController extends Controller
             $origin = strtolower($origin);
         }        
 
-        DB::insert('insert into tasa_dolar (id, rate,origin_id,created_at) values (?, ?, ?, ?)', 
+        DB::insert('insert into tasa_dolar (rate,origin_id) values (?, ?)', 
         [
-            null,
             $inputs['dolar-rate'],
             $inputs['origin'],
-            null
         ]);
 
         return redirect(route('indexTasaDolar').'?origin='.$origin);
