@@ -23,12 +23,14 @@
           <label for="origin">Origen</label>
           <select name="origin" id="origin" class="form-control" required>
               @foreach ($dolarOrigins as $origin)
-                  <option value="{{$origin->id}}">{{$origin->name}}</option>
+                  <option value="{{$origin->id}}"
+                    {{($origin->code == $selectedOrigin)?'selected':''}}
+                    >{{$origin->name}}</option>
               @endforeach
           </select>
         </div>
         <button type="submit" class="btn btn-primary">Cargar</button>
-        <a href="{{route('indexTasaDolar').'?origin=monitor'}}" class="btn btn-secondary">Cancelar</a>
+        <a href="{{route('indexTasaDolar').'?origin='.$selectedOrigin}}" class="btn btn-secondary">Cancelar</a>
       </form>
     </div>
   </main>

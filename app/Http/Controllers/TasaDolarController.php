@@ -8,67 +8,41 @@ use Illuminate\Support\Facades\DB;
 class TasaDolarController extends Controller
 {
     public function display (Request $request) {
-        // Id de Monitor
-        $monitorQuery = DB::select('select id from dolar_origen where name=?',['Monitor Dolar']);
-        $monitorId = $monitorQuery[0]->id;
-        // Id de BCV
-        $bcvQuery = DB::select('select id from dolar_origen where name=?',['BCV']);
-        $bcvId = $bcvQuery[0]->id;
-    
-        // Registro de Tasa
-        $tasaDolarMonitor = DB::select('select id,rate,created_at from tasa_dolar where origin_id=?',[$monitorId]);
-        $tasaDolarBCV = DB::select('select id,rate,created_at from tasa_dolar where origin_id=?',[$bcvId]);
         
         $originDolar = $request->query('origin');
     
         if($originDolar=='bcv'){
-            $tasaDolar = $tasaDolarBCV;
             $originDolar = 'BCV';
         }else{
-            $tasaDolar = $tasaDolarMonitor;
             $originDolar = 'Monitor Dolar';
         }
-        // Data set    
-        $tasaDataset = [
-            "date" =>[],
-            "rate" =>[]
-        ];
-        // Parse Dataset
-        foreach($tasaDolar as $tasa){
-            array_push($tasaDataset["date"],$tasa->created_at);
-            array_push($tasaDataset["rate"],$tasa->rate);
-        }
         
-        // Date processing
-        $counter = 1;
-        foreach($tasaDolar as $tasa){
-            $timestamp = $tasa->created_at;
-            unset($tasa->created_at);
-            $timestamp_aux = explode(" ",$timestamp);
-            $tasa->date = $timestamp_aux[0];
-            
-            $date_aux = explode("-",$tasa->date);
-            $date_aux = array_reverse($date_aux);
-
-            $tasa->date = implode("-",$date_aux);
-
-            $tasa->time = $timestamp_aux[1];
-            $tasa->id = $counter;
-            $counter++;
-        }
-
         return view('tasaDolar/index',[
-            "tasaDolar" => $tasaDolar,
             "originDolar" => $originDolar,
-            "tasaDataset" => $tasaDataset
         ]);
     }
 
     public function addRate (Request $request) {
-        $origins = DB::select('select * from dolar_origen where name !=?',['Otros']);        
+        $origins = DB::select('select id,name from dolar_origen where name !=?',['Otros']);        
+        
+        foreach($origins as $origin){
+            $codeAux = $origin->name;
+            $codeAux = explode(" ",$codeAux);
+            $codeAux = $codeAux[0];
+            $codeAux = strtolower($codeAux);
+            $origin->code = $codeAux;
+        }
+
+        $selectedOrigin = $request->query('origin');
+
+        // Si no es 'bcv' es 'monitor'
+        if(strtolower($selectedOrigin)!='bcv'){
+            $selectedOrigin = 'monitor';
+        }
 
         return view('tasaDolar/new',[
-            "dolarOrigins" => $origins
+            "dolarOrigins" => $origins,
+            "selectedOrigin" => $selectedOrigin
         ]);
     }
 

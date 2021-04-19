@@ -21,6 +21,10 @@ use App\Http\Controllers\LoginController;
 
 Route::get('/', function (Request $request) {    
     return view('index');
+})->name('index')->middleware('activeSession');
+
+Route::get('/dashboard', function (Request $request) {    
+    return view('index');
 })->name('dashboard')->middleware('activeSession');
 
 /**

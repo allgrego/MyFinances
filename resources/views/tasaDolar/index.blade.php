@@ -1,109 +1,112 @@
 @extends('layouts/main-layout')
 
 @section('content')
-  <div class="chartjs-size-monitor" style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
-  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-    <h1 class="h2">Tasa de Cambio ({{$originDolar}})</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-      <div class="btn-group mr-2">
-        <a href="{{route('indexTasaDolar').'?origin=monitor'}}" class="btn btn-sm btn-outline-{{$originDolar!='BCV'?'primary':'secondary'}}">Monitor</a>
-        <a href="{{route('indexTasaDolar').'?origin=bcv'}}" class="btn btn-sm btn-outline-{{$originDolar=='BCV'?'primary':'secondary'}}">BCV</a>
-      </div>
-      <a href="{{route('agregarTasaDolar')}}" class="btn btn-sm btn-outline-secondary">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-        Agregar Tasa
-      </a>
-    </div>
-  </div>        
-
-  <div class="row">
-    <canvas className="my-8 col-6 chartjs-render-monitor" id="myChart" width="696" height="293" style="
-      display: block;
-      width: 696px;
-      height: 293px;
-    "></canvas>
+  {{-- Page Heading --}}
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Tasa de Cambio ({{$originDolar}})</h1>
+    <a href="{{route('indexTasaDolar').'?origin='}}{{$originDolar=='BCV'?'monitor':'bcv'}}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm"><i
+      class="fas fa-toggle-off fa-sm text-white-50"></i> Ver {{$originDolar == 'BCV'?'Monitor Dolar':'BCV'}}</a>
+    <a href="{{route('agregarTasaDolar').'?origin='}}{{$originDolar=='BCV'?'bcv':'monitor'}}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+      class="fas fa-plus-circle fa-sm text-white-50"></i> Agregar Tasa</a>
   </div>
-    
-  
-    <h2>Log de Tasa de Cambio ({{$originDolar}})</h2>
-    <table id="example" class="display" width="100%"></table>
-    <div class="table-responsive">
-      <table class="table table-striped table-sm" id="list-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Tasa (Bs/$)</th>
-            <th>Fecha</th>
-            <th>Hora</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="font-weight: 600">Cargando ...</td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
 
+  {{-- Content Row --}}
+  <div class="row">
+    {{-- Area Chart --}}
+    <div class="col-xl-6 col-lg-6 col-md-12 order-lg-last order-md-first">
+      <div class="card shadow mb-4">
+          {{-- Card Header - Dropdown --}}
+          <div
+              class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+              <h6 class="m-0 font-weight-bold text-primary">Gráfica</h6>
+              <div class="dropdown no-arrow">
+                  <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                      aria-labelledby="dropdownMenuLink">
+                      <div class="dropdown-header">Dropdown Header:</div>
+                      <a class="dropdown-item" href="#">Action</a>
+                      <a class="dropdown-item" href="#">Another action</a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="#">Something else here</a>
+                  </div>
+              </div>
+          </div>
+          {{-- Card Body --}}
+          <div class="card-body">
+              <div class="chart-area">
+                  <canvas id="myAreaChart"></canvas>
+              </div>
+          </div>
+      </div>
+    </div>
+    <!-- DataTales Example -->
+  <div class="col-xl-6 col-lg-6 col-md-12 order-lg-first order-md-last">
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Log</h6>
+      </div>
+      <div class="card-body">
+          <div class="table-responsive">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                  <thead>
+                    <tr>
+                      <th>id</th>
+                      <th>Tasa (Bs/$)</th>
+                      <th>Fecha</th>
+                      <th>Hora</th>
+                    </tr>
+                  </thead>
+                  <tfoot>
+                    <tr>
+                      <th>id</th>
+                      <th>Tasa (Bs/$)</th>
+                      <th>Fecha</th>
+                      <th>Hora</th>
+                    </tr>
+                  </tfoot>
+                  <tbody>
+                    <tr>
+                      <td style="font-weight: 700">Cargando ...</td>
+                    </tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+
+  </div>
+
+</div>
 @endsection
 
 @section('scripts')
-    <!-- Graphs -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
     <script>
-    var ctx = document.getElementById("myChart");
-    var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: [],
-          datasets: [{
-            label: "Bs/$",
-            data: [],
-            lineTension: 0.1,
-            backgroundColor: 'transparent',
-            borderColor: '#3490dc',
-            borderWidth: 3,
-            pointBackgroundColor: '#007bff'            
-            
-          }
-        ]
-        },
-        options: {
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: false
-              }
-            }]
-          },
-          legend: {
-            display: true,
-          }
-        }
-      });
-
       var updateTasa = function() {
+
+        console.log("{{ route('api.dolar').'?amount=5&origin='.strtolower($originDolar) }}");
+      // Chart Data
       $.ajax({
-        url: "{{ route('api.chart').'?origin='.strtolower($originDolar) }}",
+        url: "{{ route('api.dolar')}}?amount=5&order=last&origin={{strtolower($originDolar)}}",
         type: 'GET',
         dataType: 'json',
         headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         success: function(data) {
-          myChart.data.labels = data.labels;
-          myChart.data.datasets[0].data = data.data;
-          myChart.data.datasets[0].label =" Bs/$ ("+data.origin+")";
-          myChart.update();
+          myLineChart.data.labels = data.labels;
+          myLineChart.data.datasets[0].data = data.data;
+          myLineChart.data.datasets[0].label =" Bs/$ ("+data.origin+")";
+          myLineChart.update();
         },
         error: function(data){
           console.log(data);
         }
       });
 
+      // Table Data
       $.ajax({
         url: "{{ route('api.chart.list').'?origin='.strtolower($originDolar) }}",
         type: 'GET',
@@ -113,8 +116,7 @@
         },
         success: function(data) {
 
-          var table = document.getElementById('list-table').getElementsByTagName('tbody')[0];
-          
+          var table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
           // Elimina los rows de la table si tiene
           if(table.rows.length){
               table.innerHTML = "";
@@ -133,11 +135,10 @@
         }
       });
     }
-    
+
     updateTasa();
     setInterval(() => {
       updateTasa();
     }, 1000*5);
-
-    </script>
+    </script>        
 @endsection

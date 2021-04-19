@@ -29,9 +29,9 @@ var ctx = document.getElementById("myAreaChart");
 var myLineChart = new Chart(ctx, {
   type: 'line',
   data: {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    labels: [],
     datasets: [{
-      label: "Earnings",
+      label: "Cargando ...",
       lineTension: 0.3,
       backgroundColor: "rgba(78, 115, 223, 0.05)",
       borderColor: "rgba(78, 115, 223, 1)",
@@ -43,7 +43,7 @@ var myLineChart = new Chart(ctx, {
       pointHoverBorderColor: "rgba(78, 115, 223, 1)",
       pointHitRadius: 10,
       pointBorderWidth: 2,
-      data: [0, 10000, 5000, 15000, 10000, 20000, 15000, 25000, 20000, 30000, 25000, 40000],
+      data: [],
     }],
   },
   options: {
@@ -59,7 +59,7 @@ var myLineChart = new Chart(ctx, {
     scales: {
       xAxes: [{
         time: {
-          unit: 'date'
+          unit: 'timestamp'
         },
         gridLines: {
           display: false,
@@ -113,29 +113,3 @@ var myLineChart = new Chart(ctx, {
     }
   }
 });
-
-
-var updateTasa = function() {
-  $.ajax({
-    url: "/api/dolar?origin=monitor",
-    type: 'GET',
-    dataType: 'json',
-    headers: {
-      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    },
-    success: function(data) {
-      myLineChart.data.labels = data.labels;
-      myLineChart.data.datasets[0].data = data.data;
-      myLineChart.data.datasets[0].label =" Bs/$ ("+data.origin+")";
-      myLineChart.update();
-    },
-    error: function(data){
-      console.log(data);
-    }
-  });
-}
-
-updateTasa();
-setInterval(() => {
-  updateTasa();
-}, 1000*5);
