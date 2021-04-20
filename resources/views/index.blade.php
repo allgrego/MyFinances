@@ -12,12 +12,49 @@
 @endsection
 
 @section('content')
-<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4"><div class="chartjs-size-monitor" style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-      <h1 class="h2">Dashboard</h1>
+{{-- Page Heading --}}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+  <h1 class="h3 mb-4 text-gray-800">Tablero</h1>  
+</div>
+<h5 class="h5 mb-4 pl-2 text-gray-600">¡Hola, Gregorio!</h5>  
+  <div class="row">
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-primary shadow h-100 py-2">
+          <div class="card-body">
+              <div class="row no-gutters align-items-center">
+                  <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                          Tasa de Cambio ($)</div>
+                      <a href="{{route('indexTasaDolar')}}"
+                      class="btn btn-primary mb-0 font-weight-bold text-white-800">Ver Tasa</a>
+                  </div>
+                  <div class="col-auto">
+                      <i class="fas fa-dollar-sign fa-2x text-gray-500"></i>
+                  </div>
+              </div>
+          </div>
+      </div>
     </div>
-    <div class="col-lg-12">
-      <h3>Bienvenido.</h3>
+  <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-danger shadow h-100 py-2">
+          <div class="card-body">
+              <div class="row no-gutters align-items-center">
+                  <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                          Deudas</div>
+                      <a
+                      href="{{route('deudas')}}"
+                       class="btn btn-danger mb-0 font-weight-bold text-white-800">Ir a Deudas</a>
+                  </div>
+                  <div class="col-auto">
+                      <i class="fas fa-money-bill fa-2x text-gray-500"></i>
+                  </div>
+              </div>
+          </div>
+      </div>
     </div>
-  </main>
+
+  </div>
 @endsection

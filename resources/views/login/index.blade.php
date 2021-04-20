@@ -12,11 +12,12 @@
       <input type="text" class="form-control form-control-user"
           name="username" id="inputUsername"
           aria-describedby="usernameHelp"
+          required
           placeholder="Enter Username...">
   </div>
   <div class="form-group">
       <input type="password" class="form-control form-control-user"
-        name="password"
+        name="password" required
         id="inputPassword" placeholder="Password">
   </div>
   <button type="submit" class="btn btn-primary btn-user btn-block">
